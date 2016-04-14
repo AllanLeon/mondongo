@@ -1,5 +1,6 @@
 1. tu mama
 2. donald trump's hair
+<<<<<<< HEAD
 que le dice un pollo a otro pollo?
 .
 .
@@ -16,3 +17,6 @@ que le dice un pollo a otro pollo?
 .....
 .....
 necesitamos a pollo!:P
+=======
+7. 
+>>>>>>> 8ec4ddd271dd3328902909a6de845a7a347fbf47
