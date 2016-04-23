@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>Scott Pilgrim</title>
+	<link rel="icon" href="assets/favicon.ico">
+	<script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+	<style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+	var game = new Phaser.Game(768, 432, Phaser.AUTO, '', {preload: preload, create: create, update: update});
+	function preload(){
+		game.load.image('background', 'assets/pixelfake.png');
+    	game.load.image('ground', 'assets/floor.png');
+    	game.load.image('note', 'assets/note.png');
+		game.load.spritesheet('scott', 'assets/scott.png', 56, 68);
+	}
+
+	var player;
+	var cursors;
+	var jumping;
+	var platforms;
+	var notes;
+
+	function create(){
+		game.physics.startSystem(Phaser.Physics.ARCADE);
+		game.add.sprite(0, 0, 'background');
+		platforms = game.add.group();
+    	platforms.enableBody = true;
+		ground = platforms.create(0, game.world.height - 36, 'ground');
+		ground.body.immovable = true;
+
+		player = game.add.sprite(32, game.world.height - 400, 'scott');
+		game.physics.arcade.enable(player);
+		player.body.collideWorldBounds = true;
+		player.body.gravity.y = 500;
+
+		player.animations.add('walk', [0, 1, 2, 3, 4, 5, 6, 7], 12, true);
+		player.animations.add('jump', [10, 11, 12, 13, 14, 15, 16, 17, 18], 8, false);
+		
+		player.anchor.setTo(.5, 1);
+		player.scale.setTo(2,2);
+		player.smoothed = false;
+		jumping = false;
+		cursors = game.input.keyboard.createCursorKeys();
+
+		notes = game.add.group();
+		notes.enableBody = true;
+		for (var i = 0; i < 10; i++){
+			var note = notes.create(i*(50*Math.random()+50)+50, 50*Math.random(), 'note');
+			note.body.gravity.y = 300;
+			note.body.bounce.y = 0.7 + Math.random() * 0.2;
+		}
+	}
+
+	function update(){
+		game.physics.arcade.collide(player, platforms);
+		game.physics.arcade.collide(notes, platforms);
+
+		game.physics.arcade.overlap(player, notes, collectNote, null, this);
+		
+		player.body.velocity.x = 0;
+		if (cursors.right.isDown){
+			player.scale.x = 2;
+			player.body.velocity.x = 200;
+			if (!jumping) {
+				player.animations.play('walk');
+			}
+		} else if (cursors.left.isDown){
+			player.scale.x = -2;
+			player.body.velocity.x = -200;
+			if (!jumping) {
+				player.animations.play('walk');
+			}
+		} else {
+			if (!jumping) {
+				player.animations.stop();
+				player.frame = 8;
+			}
+		}
+
+		if (player.body.touching.down) {
+			jumping = false;
+		} 
+
+		if (cursors.up.isDown && !jumping){
+			player.body.velocity.y = -300;
+			jumping = true;
+			player.animations.play('jump');
+		}
+
+	}
+
+	function collectNote(player, note){
+		note.kill();
+	}
+
+</script>
+</body>
+</html>
